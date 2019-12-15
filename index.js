@@ -1,4 +1,3 @@
-const url = require('url');
 const request = require('request');
 
 function makeHeaders(o) {
@@ -34,43 +33,45 @@ class webClient {
       this.request('/launcher/1', (err, res, body) => {
         const token = body.match(/meta content="(.+?)" name="csrf-token"/i);
         if (!token) {
-          console.error('failed to get CSRF token');
+          console.log('Failed to get CSRF token');
           return;
         }
 
+        console.log('Retrieving auth ticket and server info')
         this.request({
           url: '/launcher/1/account_server_info?attach_auth_ticket=1',
           headers: makeHeaders({
-            'Referer': 'https://account.enmasse.com/launcher/1',
+            'Referer': 'https://account.enmasse.com/launcher/1/signin',
             'X-CSRF-Token': token[1],
             'X-Requested-With': 'XMLHttpRequest',
           }),
         }, (err, res, body) => {
           if (err) {
-            console.error(err);
-            return callback('failed to get info');
+            console.log('Error: ');
+            console.log(err);
+            return callback('Failed to get account server info');
           }
 
           if (res.statusCode !== 200) {
-            console.error('statusCode != 200');
-            return callback('statusCode != 200');
+            console.log(res.body);
+            return callback('Expected status code to be 200, was ' + res.statusCode);
           }
 
           let data;
           try {
             data = JSON.parse(body);
           } catch (e) {
-            console.error(body);
-            console.error(e);
+            console.log('Error: ');
+            console.log(body);
+            console.log(e);
             return callback('JSON parse error');
           }
 
           if (data['result-code'] !== 200) {
-            console.error('result-code != 200');
-            return callback('result-code != 200');
+            return callback('Expected status code to be 200, was ' + data['result-code']);
           }
 
-          console.log(`[web] got ticket (${data.master_account_name}:${data.ticket})`);
+          console.log(`Ticket retrieved (${data.master_account_name}:${data.ticket})`);
 
           callback(null, {
             name: data.master_account_name,
@@ -96,24 +97,28 @@ class webClient {
       this.ready = 0;
     }
 
-    console.log('[web] (login) getting CSRF token');
+    console.log('Getting CSRF token');
 
-    this.request('/', (err, res, body) => {
+    this.request('/launcher/1/signin', (err, res, body) => {
       if (err) {
-        console.error(err);
+        console.log('Error: ');
+        console.log(err);
         return;
       }
 
       const token = body.match(/meta content="(.+?)" name="csrf-token"/i);
       if (!token) {
-        console.error('failed to get CSRF token');
+        console.log('Failed to get CSRF token');
         return;
       }
 
+      console.log('Got CSRF token: ' + token[1]);
+
       this._authenticate(callback, {
         'authenticity_token': token[1],
-        'user[client_time]': '',
+        'user[client_time]': Date(Date.UTC()),
         'user[io_black_box]': this.ioBlackBoxToken,
+        'game_id' : 1,
         'user[email]': this.email,
         'user[password]': this.pass,
       });
@@ -126,22 +131,23 @@ class webClient {
    * Submits login form and follows the redirect.
    */
   _authenticate(callback, params) {
-    console.log('[web] (login) authenticating');
+    console.log('Authenticating account: ' + params['user[email]']);
 
     this.request.post({
       url: '/launcher/1/authenticate',
       headers: makeHeaders({
-        'Referer': 'https://account.enmasse.com/',
+        'Referer': 'https://account.enmasse.com/launcher/1/signin',
+        'Content-Type': 'application/x-www-form-urlencoded',
       }),
       form: params,
     }, (err, res, body) => {
       if (err) {
-        console.error(err);
+        console.log(err);
         return;
       }
 
       if (res.statusCode !== 302) {
-        console.error('failed to auth');
+        console.log('Failed to authenticate');
         return;
       }
 

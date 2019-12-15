@@ -1,40 +1,11 @@
 {
-  "_from": "github:meishuu/tera-auth-ticket",
-  "_id": "tera-auth-ticket@1.0.0",
-  "_inBundle": false,
-  "_integrity": "",
-  "_location": "/tera-auth-ticket",
-  "_phantomChildren": {},
-  "_requested": {
-    "type": "git",
-    "raw": "tera-auth-ticket@github:meishuu/tera-auth-ticket",
-    "name": "tera-auth-ticket",
-    "escapedName": "tera-auth-ticket",
-    "rawSpec": "github:meishuu/tera-auth-ticket",
-    "saveSpec": "github:meishuu/tera-auth-ticket",
-    "fetchSpec": null,
-    "gitCommittish": null
-  },
-  "_requiredBy": [
-    "/"
-  ],
-  "_resolved": "github:meishuu/tera-auth-ticket#0621811e3746435eab71dbce5fcc78abae597673",
-  "_spec": "tera-auth-ticket@github:meishuu/tera-auth-ticket",
-  "_where": "C:\\Users\\Kevin\\tera-discord-relay",
-  "author": {
-    "name": "meishu"
-  },
-  "bundleDependencies": false,
+  "name": "tera-auth-ticket",
+  "version": "1.0.3",
+  "description": "Simulate logging onto an EME TERA account to retrieve an auth ticket",
+  "license": "ISC",
+  "author": "meishu",
+  "main": "index.js",
   "dependencies": {
     "request": "^2.74.0"
-  },
-  "deprecated": false,
-  "description": "Simulate logging onto an EME TERA account to retrieve an auth ticket",
-  "engines": {
-    "node": ">=6.0.0"
-  },
-  "license": "ISC",
-  "main": "index.js",
-  "name": "tera-auth-ticket",
-  "version": "1.0.0"
+  }
 }
